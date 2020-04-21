@@ -15,7 +15,21 @@ limitations under the License.
 */
 package main
 
-import "mcleaner/cmd"
+import (
+	"github.com/spf13/viper"
+	"log"
+	"mcleaner/cmd"
+)
+
+func init() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	cmd.Execute()
