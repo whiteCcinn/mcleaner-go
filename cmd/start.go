@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"mcleaner/config"
 
 	"github.com/spf13/cobra"
 )
@@ -39,6 +40,8 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(startCmd)
+
+	fmt.Printf("%+v\n", config.Config)
 
 	fmt.Println("获取配置文件的app_id", viper.AllKeys())
 }

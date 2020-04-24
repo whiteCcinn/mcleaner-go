@@ -1,0 +1,41 @@
+# 公共复用数据
+common:
+  kafka: &commonKafkaBroker
+    broker:
+      - 192.168.8.208:9092
+      - 192.168.8.208:9092
+    group: &commonKafkaGroup
+      mcleaner_24
+  redis: &commonRedisGroup
+    ip: 192.168.8.205
+    port: 6037
+    auth: 123456
+    db: 0
+
+# app相关信息
+app:
+  id: 24
+  name: mcleaner
+
+# kafka相关信息
+kafka:
+  consumer:
+    <<: *commonKafkaBroker
+    # 自身属性覆盖公共属性
+    broker:
+      - 192.168.8.206:9092
+      - 192.168.8.206:9092
+    group: *commonKafkaGroup
+
+  producer:
+    <<: *commonKafkaBroker
+
+
+# redis相关信息
+redis:
+  setting:
+    <<: *commonRedisGroup
+  settingTools:
+    <<: *commonRedisGroup
+    ip: 192.168.8.204
+    db: 1
