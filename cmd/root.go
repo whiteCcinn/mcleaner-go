@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"mcleaner/config"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -62,6 +63,9 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// 加载项目配置文件
+	config.InitConfig()
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -16,24 +16,9 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
-	"github.com/spf13/viper"
-	"log"
 	"mcleaner/cmd"
-	"mcleaner/config"
 )
 
 func main() {
-	fmt.Println(1)
-	viper.SetConfigName("config")
-	viper.AddConfigPath("./")
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal(err)
-	}
-	err := viper.Unmarshal(&config.Config)
-	if err != nil {
-		log.Fatalf("unable to decode into struct, %v", err)
-	}
-	fmt.Printf("%+v\n", config.Config)
 	cmd.Execute()
 }

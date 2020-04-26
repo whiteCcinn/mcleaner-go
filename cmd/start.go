@@ -17,31 +17,21 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	"mcleaner/config"
-
 	"github.com/spf13/cobra"
+	"mcleaner/config"
 )
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "启动服务",
+	Long: `启动服务指令`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("start called")
+		// 需要做的内容
+		fmt.Printf("%+v\n", config.Config)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(startCmd)
-
-	fmt.Printf("%+v\n", config.Config)
-
-	fmt.Println("获取配置文件的app_id", viper.AllKeys())
 }
