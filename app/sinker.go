@@ -87,7 +87,6 @@ func (p *emptySinker) Handle(ctx context.Context) {
 		client.Del(dataKey)
 
 		// 写锁
-		// 写锁
 		rw.Lock()
 		i++
 		rw.Unlock()
