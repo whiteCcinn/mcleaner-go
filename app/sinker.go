@@ -6,6 +6,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/go-redis/redis/v7"
 	mconfig "mcleaner/config"
+	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -47,7 +48,7 @@ func (p *emptySinker) Handle(ctx context.Context) {
 	ticker := time.NewTicker(time.Second * 5)
 	defer func() { ticker.Stop() }()
 
-	rw :=sync.RWMutex{}
+	rw := sync.RWMutex{}
 
 	i := 0
 	go func() {
@@ -56,7 +57,7 @@ func (p *emptySinker) Handle(ctx context.Context) {
 			case <-ticker.C:
 				// 读锁
 				rw.RLock()
-				fmt.Printf("tps: %d\n", i/(interval))
+				fmt.Printf("core: %d, tps: %d\n", runtime.NumCPU(), i/(interval))
 				rw.RUnlock()
 
 				// 写锁
