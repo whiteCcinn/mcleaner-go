@@ -71,10 +71,10 @@ func (p *emptySinker) Handle(ctx context.Context) {
 		}
 	}()
 
-	for count := 0; count < 7; {
+	for count := 0; count < 9; {
 		wg.Add(1)
 		go func() {
-			wg.Done()
+			defer func() { wg.Done() }()
 			for {
 				result, err := client.BLPop(30*time.Second, listKey).Result()
 				if err != nil {
