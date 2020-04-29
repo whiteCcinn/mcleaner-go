@@ -15,9 +15,7 @@ limitations under the License.
 */
 package main
 
-import (
-	"mcleaner/cmd"
-)
+import "mcleaner/cmd"
 
 func main() {
 	cmd.Execute()

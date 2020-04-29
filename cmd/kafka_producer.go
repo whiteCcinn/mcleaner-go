@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 
 	"github.com/spf13/cobra"
@@ -64,9 +65,12 @@ var kafkaProducerCmd = &cobra.Command{
 			}
 		}()
 
+		i := 0
 	ProducerLoop:
 		for {
-			message := &sarama.ProducerMessage{Topic: "my-topic", Value: sarama.StringEncoder("testing 123")}
+			i++
+			msg := "testing 123" + strconv.Itoa(i)
+			message := &sarama.ProducerMessage{Topic: "my-topic", Value: sarama.StringEncoder(msg)}
 			select {
 			case producer.Input() <- message:
 				enqueued++

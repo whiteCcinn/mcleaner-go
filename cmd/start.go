@@ -16,19 +16,44 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"context"
 	"github.com/spf13/cobra"
-	"mcleaner/config"
+	"mcleaner/app"
+	"sync"
 )
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "启动服务",
-	Long: `启动服务指令`,
+	Long:  `启动服务指令`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// 需要做的内容
-		fmt.Printf("%+v\n", config.Config)
+		// 2个协程并行处理各自到需求
+
+		ctx := context.Background()
+		wg := sync.WaitGroup{}
+
+		// 从kafka拉数据到redis
+		wg.Add(1)
+		go func(ctx context.Context) {
+			defer func() { wg.Done() }()
+			pioneer := app.PioneerBackground()
+			pioneer.Handle(ctx)
+		}(ctx)
+
+		// 从redis拉数据下来处理逻辑
+		wg.Add(1)
+		go func(ctx context.Context) {
+			defer func() { wg.Done() }()
+			sinker := app.SinkerBackground()
+			sinker.Handle(ctx)
+		}(ctx)
+
+		// todo:
+		// 主协程捕捉错误，其中一个有致命问题的话，那就结束整个程序
+		// 采用 select + context channel实现
+		// select {}
+		wg.Wait()
 	},
 }
 
