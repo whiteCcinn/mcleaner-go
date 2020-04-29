@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis/v7"
 	mconfig "mcleaner/config"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,31 @@ func (p *emptySinker) Handle(ctx context.Context) {
 	})
 
 	listKey := fmt.Sprintf("%s:%d:list-key", mconfig.Config.App.Name, mconfig.Config.App.Id)
+
+	interval := 5
+	ticker := time.NewTicker(time.Second * 5)
+	defer func() { ticker.Stop() }()
+
+	rw :=sync.RWMutex{}
+
+	i := 0
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				// 读锁
+				rw.RLock()
+				fmt.Printf("tps: %d\n", i/(interval))
+				rw.RUnlock()
+
+				// 写锁
+				rw.Lock()
+				i = 0
+				rw.Unlock()
+			}
+		}
+	}()
+
 	for {
 		result, err := client.BLPop(30*time.Second, listKey).Result()
 		if err != nil {
@@ -51,13 +77,20 @@ func (p *emptySinker) Handle(ctx context.Context) {
 		dataKey := result[1]
 
 		// 获取数据
-		msg, err := client.Get(dataKey).Result()
-		fmt.Println(msg)
+		//msg, err := client.Get(dataKey).Result()
+		_, err = client.Get(dataKey).Result()
+
 		// 消费数据
-		fmt.Printf("消费了数据: %s\n", fmt.Sprintf("%s", msg))
+		//fmt.Printf("消费了数据: %s\n", fmt.Sprintf("%s", msg))
 
 		// 从redis移除，完成redis的ack
 		client.Del(dataKey)
+
+		// 写锁
+		// 写锁
+		rw.Lock()
+		i++
+		rw.Unlock()
 	}
 
 }

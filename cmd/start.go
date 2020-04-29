@@ -28,7 +28,7 @@ var startCmd = &cobra.Command{
 	Short: "启动服务",
 	Long:  `启动服务指令`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// 2个协程并行处理各自到需求
+		// 2个协程并行处理各自的需求
 
 		ctx := context.Background()
 		wg := sync.WaitGroup{}
