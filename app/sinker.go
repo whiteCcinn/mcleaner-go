@@ -49,9 +49,12 @@ func (p *emptySinker) Handle(ctx context.Context) {
 	defer func() { ticker.Stop() }()
 
 	rw := sync.RWMutex{}
+	wg := sync.WaitGroup{}
 
 	i := 0
+	wg.Add(1)
 	go func() {
+		defer func() { wg.Done() }()
 		for {
 			select {
 			case <-ticker.C:
@@ -68,29 +71,37 @@ func (p *emptySinker) Handle(ctx context.Context) {
 		}
 	}()
 
-	for {
-		result, err := client.BLPop(30*time.Second, listKey).Result()
-		if err != nil {
-			println("sinker 超时")
-			continue
-		}
+	for count := 0; count < 7; {
+		wg.Add(1)
+		go func() {
+			wg.Done()
+			for {
+				result, err := client.BLPop(30*time.Second, listKey).Result()
+				if err != nil {
+					println("sinker 超时")
+					continue
+				}
 
-		dataKey := result[1]
+				dataKey := result[1]
 
-		// 获取数据
-		//msg, err := client.Get(dataKey).Result()
-		_, err = client.Get(dataKey).Result()
+				// 获取数据
+				//msg, err := client.Get(dataKey).Result()
+				_, err = client.Get(dataKey).Result()
 
-		// 消费数据
-		//fmt.Printf("消费了数据: %s\n", fmt.Sprintf("%s", msg))
+				// 消费数据
+				//fmt.Printf("消费了数据: %s\n", fmt.Sprintf("%s", msg))
 
-		// 从redis移除，完成redis的ack
-		client.Del(dataKey)
+				// 从redis移除，完成redis的ack
+				client.Del(dataKey)
 
-		// 写锁
-		rw.Lock()
-		i++
-		rw.Unlock()
+				// 写锁
+				rw.Lock()
+				i++
+				rw.Unlock()
+			}
+		}()
+		count++
 	}
 
+	wg.Wait()
 }

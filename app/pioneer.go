@@ -87,8 +87,8 @@ func (h consumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, cla
 
 	// 如果有消息，会从"消息链"的channel中读取
 	for msg := range claim.Messages() {
-		fmt.Printf("Message topic:%q partition:%d offset:%d\n", msg.Topic, msg.Partition, msg.Offset)
-		fmt.Printf("%s", msg.Value)
+		//fmt.Printf("Message topic:%q partition:%d offset:%d\n", msg.Topic, msg.Partition, msg.Offset)
+		//fmt.Printf("%s", msg.Value)
 
 		// partition + md5(消息内容)
 		key := strconv.Itoa(int(msg.Partition)) + fmt.Sprintf("%x", md5.Sum(msg.Value))
